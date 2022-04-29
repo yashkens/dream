@@ -15,6 +15,10 @@ ENV SERVICE_NAME ${SERVICE_NAME}
 COPY skills/${SERVICE_NAME}/requirements.txt .
 RUN pip install -r requirements.txt
 RUN python -m nltk.downloader wordnet
+RUN python -c "import nltk; nltk.download('stopwords')"
+RUN python -c "model = 'gpt2-medium';\
+import transformers as tfmr;tfmr.AutoTokenizer.from_pretrained(model);tfmr.AutoModel.from_pretrained(model)"
+COPY . ./
 
 COPY skills/${SERVICE_NAME}/ ./
 COPY ./common/ ./common/
@@ -26,4 +30,4 @@ ENV SERVICE_PORT ${SERVICE_PORT}
 HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD curl --fail 127.0.0.1:${SERVICE_PORT}/healthcheck || exit 1
 
 
-CMD gunicorn --workers=1 server:app -b 0.0.0.0:${SERVICE_PORT} --timeout=1000
+CMD gunicorn --workers=1 server:app -b 0.0.0.0:${SERVICE_PORT} --timeout=1000 --log-level=debug

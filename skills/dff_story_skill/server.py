@@ -14,12 +14,12 @@ import numpy as np
 import json
 from sklearn.metrics.pairwise import cosine_similarity
 # from sentence_transformers import SentenceTransformer
-from transformers import GPT2LMHeadModel, GPT2Config, GPT2Tokenizer
+from transformers import GPT2LMHeadModel, GPT2Config, GPT2Tokenizer, AutoModel, AutoTokenizer
 
 
 import nltk
 from nltk.corpus import stopwords
-nltk.download('stopwords')
+# nltk.download('stopwords')
 import RAKE
 
 stop_words = stopwords.words('english')
@@ -48,8 +48,9 @@ health = HealthCheck(app, "/healthcheck")
 logging.getLogger("werkzeug").setLevel("WARNING")
 
 # model_sim = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-configuration = GPT2Config.from_pretrained('gpt2-medium', output_hidden_states=True)
-model = GPT2LMHeadModel.from_pretrained('gpt2-medium', config=configuration)
+# configuration = GPT2Config.from_pretrained('gpt2-medium', output_hidden_states=True)
+model = AutoModel.from_pretrained('gpt2-medium')
+tokenizer = AutoTokenizer.from_pretrained('gpt2')
 logger.info(f"Model loaded!")
 # logger.info(f"Model: {model_sim}")
 # worker time out в докере посмотреть
