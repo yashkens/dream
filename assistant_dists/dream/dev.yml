@@ -400,4 +400,10 @@ services:
       - "./common:/src/common"
     ports:
       - 8120:8120
+  dff-story-skill:
+    volumes:
+      - "./skills/dff_story_skill:/src"
+      - "./common:/src/common"
+    ports:
+      - 8122:8122
 version: "3.7"
