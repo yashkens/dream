@@ -1,0 +1,18 @@
+services:
+  agent:
+    env_file: [.env]
+    command: sh -c 'bin/wait && python -m deeppavlov_agent.run -ch http_client --cors'
+    build:
+      context: ./
+      dockerfile: dockerfile_agent
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+
+  mongo:
+    command: mongod
+    image: mongo:4.0.0
+version: '3.7'
