@@ -398,7 +398,7 @@ services:
     volumes:
       - "./services/storygpt:/src"
     ports:
-      - 8125:8125
+      - 8126:8126
   dialogpt:
     volumes:
       - "./services/dialogpt:/src"

@@ -593,15 +593,6 @@ services:
     environment:
       - PROXY_PASS=dream.deeppavlov.ai:8125
 
-
-  storygpt:
-    command: [ "nginx", "-g", "daemon off;" ]
-    build:
-      context: dp/proxy/
-      dockerfile: Dockerfile
-    environment:
-      - PROXY_PASS=dream.deeppavlov.ai:8125
-
   dff-template-skill:
     command: [ "nginx", "-g", "daemon off;" ]
     build:

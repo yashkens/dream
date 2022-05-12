@@ -1163,11 +1163,11 @@ services:
     env_file: [ .env ]
     build:
       args:
-        SERVICE_PORT: 8125
+        SERVICE_PORT: 8126
         SERVICE_NAME: storygpt
         PRETRAINED_MODEL_NAME_OR_PATH: gpt2-medium
       context: ./services/storygpt/
-    command: flask run -h 0.0.0.0 -p 8125
+    command: flask run -h 0.0.0.0 -p 8126
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - FLASK_APP=server
