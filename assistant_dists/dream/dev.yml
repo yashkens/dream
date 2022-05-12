@@ -399,6 +399,11 @@ services:
       - "./services/storygpt:/src"
     ports:
       - 8125:8125
+  dialogpt:
+    volumes:
+      - "./services/dialogpt:/src"
+    ports:
+      - 8125:8125
   dff-template-skill:
     volumes:
       - "./skills/dff_template_skill:/src"

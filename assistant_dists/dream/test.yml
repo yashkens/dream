@@ -123,6 +123,9 @@ services:
   midas-predictor:
     environment:
       - CUDA_VISIBLE_DEVICES=6
+  dialogpt:
+    environment:
+      - CUDA_VISIBLE_DEVICES=6
   storygpt:
     environment:
       - CUDA_VISIBLE_DEVICES=6
