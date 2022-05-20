@@ -14,13 +14,13 @@ logger = logging.getLogger(__name__)
 flows = {
     GLOBAL: {TRANSITIONS: {
         ("story_flow", "fallback_node"): loc_cnd.needs_scripted_story,
-        ("story_flow", "gpt_story"): cnd.neg(loc_cnd.needs_scripted_story)}
+        ("story_flow", "gpt_topic"): cnd.neg(loc_cnd.needs_scripted_story)}
     },
     "story_flow": {
         "start_node": {
             RESPONSE: "",
             TRANSITIONS: {
-                "gpt_story": cnd.neg(loc_cnd.needs_scripted_story),
+                "gpt_topic": cnd.neg(loc_cnd.needs_scripted_story),
                 "choose_story_node": cnd.all(
                     [
                         loc_cnd.is_tell_me_a_story,
@@ -54,7 +54,7 @@ flows = {
         "fallback_node": {
             RESPONSE: loc_rsp.fallback,
             TRANSITIONS: {
-                "gpt_story": cnd.neg(loc_cnd.needs_scripted_story),
+                "gpt_topic": cnd.neg(loc_cnd.needs_scripted_story),
                 "which_story_node": cnd.all(
                     [
                         loc_cnd.is_asked_for_a_story,
@@ -63,8 +63,14 @@ flows = {
                     ])
                 },
         },
+        "gpt_topic": {
+            RESPONSE: loc_rsp.choose_topic,
+            TRANSITIONS: {
+                "gpt_story": cnd.true()
+            }
+        },
         "gpt_story": {
-            RESPONSE: loc_rsp.generate_story}
+            RESPONSE: loc_rsp.generate_prompt_story}
     },
 }
 

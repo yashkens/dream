@@ -79,12 +79,9 @@ def generate_part(texts, max_len, temp, num_sents, first):
 
 
 def generate_response(context):
-    # last_utt = context[-1]
-    full_context = context
-    if 'story' in full_context[-1]:
-        full_context = full_context[:-1]
-    logger.info(f"Full contexts in StoryGPT service: {full_context}")
-    texts = ["Let me share a happy story about travel. I went to Mexico"]
+    noun = context[-1]
+    logger.info(f"Topic in StoryGPT service: {noun}")
+    texts = [f"Let me share a story about {noun}. I had {noun}"]
     first_texts = generate_part(texts, 30, 1, 4, first=True) # 100
     logger.info(f"First part ready: {first_texts[0]}")
     final_texts = generate_part(first_texts * 2, 50, 0.8, 5, first=False) # 150

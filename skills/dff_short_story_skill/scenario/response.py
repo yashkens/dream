@@ -133,9 +133,55 @@ def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     #     logger.info(f"CTX CONTENTS: {full_ctx}")
     #     resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=30)
     # resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=30)
-    resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=300)
-    raw_responses = resp.json()
-    logger.info(f"skill receives from service: {raw_responses}")
-    reply = raw_responses[0][0]
-    reply = 'Oh, that reminded me of a story! ' + reply
+    utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
+    logger.info(f'Utterance: {utt}')
+    if utt:
+        resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[utt]]}, timeout=300)
+        raw_responses = resp.json()
+        logger.info(f"skill receives from service: {raw_responses}")
+        reply = raw_responses[0][0]
+        reply = 'Oh, that reminded me of a story! ' + reply
+    else:
+        reply = ''
+    return reply
+
+
+def choose_noun(nouns):
+    for noun in nouns:
+        if 'story' not in noun:
+            return noun
+    return ''
+
+
+def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
+    int_ctx.set_can_continue(ctx, actor, "MUST_CONTINUE")
+    return "What do you want the story to be about?"
+
+
+def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
+    utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
+    logger.info(f'Utterance: {utt}')
+    if utt:
+        full_ctx = ctx.misc.get('agent', {}).get('dialog', {}).get('human_utterances', [])
+        last_utt = full_ctx[-1]['text']
+        nouns = full_ctx[-1].get('annotations', {}).get('spacy_nounphrases', [])
+        logger.info(f'Nouns: {nouns}')
+
+        final_noun = choose_noun(nouns)
+        if "don't know" in last_utt or "not know" in last_utt \
+            or "don't care" in last_utt or "not care" in last_utt:
+            final_noun = 'a cat'
+        if not final_noun:
+            final_noun = 'a cat'
+        final_noun = final_noun.replace('my', '').strip()
+
+        logger.info(f'Final noun: {final_noun}')
+
+        resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[utt]]}, timeout=300)
+        raw_responses = resp.json()
+        logger.info(f"skill receives from service: {raw_responses}")
+        reply = raw_responses[0][0]
+        reply = 'Oh, that reminded me of a story! ' + reply
+    else:
+        reply = ''
     return reply
