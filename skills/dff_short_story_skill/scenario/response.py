@@ -2,6 +2,7 @@ import logging
 import json
 import re
 import random
+import requests
 
 from df_engine.core import Context, Actor
 
@@ -19,6 +20,9 @@ with open(
     "data/phrases.json",
 ) as phrases_json:
     phrases = json.load(phrases_json)
+
+# STORYGPT_SERVICE_URL = "http://storygpt:8126/respond"
+STORYGPT_SERVICE_URL = "http://prompt-storygpt:8127/respond"
 
 
 def get_previous_node(ctx: Context) -> str:
@@ -114,3 +118,24 @@ def fallback(ctx: Context, actor: Actor, *args, **kwargs) -> str:
         int_ctx.set_can_continue(ctx, actor, "MUST_CONTINUE")
         int_ctx.set_confidence(ctx, actor, 0.5) if int_cnd.is_do_not_know_vars(ctx, actor) else None
         return random.choice(sorted(phrases.get("start_phrases", [])))
+
+
+def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
+    # logger.info(f"Last utterance: {ctx.last_request}")
+    # full_ctx = ctx.misc.get('agent', {}).get('dialog', {}).get('human_utterances', [])
+    # if full_ctx:
+    #     ctx_texts = [c['text'] for c in full_ctx]
+    #     # logger.info(f"Full context: {full_ctx}")
+    #     logger.info(f"Contexts sent to StoryGPT service: {ctx_texts}")
+    #     resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [ctx_texts]}, timeout=30)
+    #
+    # else:
+    #     logger.info(f"CTX CONTENTS: {full_ctx}")
+    #     resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=30)
+    # resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=30)
+    resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=300)
+    raw_responses = resp.json()
+    logger.info(f"skill receives from service: {raw_responses}")
+    reply = raw_responses[0][0]
+    reply = 'Oh, that reminded me of a story! ' + reply
+    return reply

@@ -23,6 +23,7 @@ sentry_sdk.init(os.getenv("SENTRY_DSN"))
 SERVICE_NAME = os.getenv("SERVICE_NAME")
 SERVICE_PORT = int(os.getenv("SERVICE_PORT"))
 RANDOM_SEED = int(os.getenv("RANDOM_SEED", 2718))
+STORY_TYPE = os.getenv("STORY_TYPE")
 
 logging.basicConfig(format="%(asctime)s - %(pathname)s - %(lineno)d - %(levelname)s - %(message)s", level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -69,13 +70,13 @@ def handler(requested_data, random_seed=None):
 
 #     t_utils.save_to_test(responses, out_file, indent=4)  # TEST
 
-try:
-    test_server.run_test(handler)
-    logger.info("test query processed")
-except Exception as exc:
-    sentry_sdk.capture_exception(exc)
-    logger.exception(exc)
-    raise exc
+# try:
+#     test_server.run_test(handler)
+#     logger.info("test query processed")
+# except Exception as exc:
+#     sentry_sdk.capture_exception(exc)
+#     logger.exception(exc)
+#     raise exc
 
 logger.info(f"{SERVICE_NAME} is loaded and ready")
 

@@ -186,7 +186,11 @@ services:
   storygpt:
     restart: unless-stopped
     environment:
-      - CUDA_VISIBLE_DEVICES=9
+      - CUDA_VISIBLE_DEVICES=0
+  prompt-storygpt:
+    restart: unless-stopped
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
   dialogpt:
     restart: unless-stopped
     environment:

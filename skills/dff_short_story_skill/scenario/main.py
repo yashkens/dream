@@ -12,19 +12,29 @@ from . import response as loc_rsp
 logger = logging.getLogger(__name__)
 
 flows = {
-    GLOBAL: {TRANSITIONS: {("story_flow", "fallback_node"): cnd.true()}},
+    GLOBAL: {TRANSITIONS: {
+        ("story_flow", "fallback_node"): loc_cnd.needs_scripted_story,
+        ("story_flow", "gpt_story"): cnd.neg(loc_cnd.needs_scripted_story)}
+    },
     "story_flow": {
         "start_node": {
             RESPONSE: "",
             TRANSITIONS: {
+                "gpt_story": cnd.neg(loc_cnd.needs_scripted_story),
                 "choose_story_node": cnd.all(
                     [
                         loc_cnd.is_tell_me_a_story,
                         loc_cnd.has_story_type,
                         loc_cnd.has_story_left,
+                        loc_cnd.needs_scripted_story
                     ]
                 ),
-                "which_story_node": cnd.all([loc_cnd.is_tell_me_a_story, cnd.neg(loc_cnd.has_story_type)]),
+                "which_story_node": cnd.all(
+                    [
+                        loc_cnd.is_tell_me_a_story,
+                        cnd.neg(loc_cnd.has_story_type),
+                        loc_cnd.needs_scripted_story
+                    ]),
             },
         },
         "choose_story_node": {
@@ -43,8 +53,18 @@ flows = {
         },
         "fallback_node": {
             RESPONSE: loc_rsp.fallback,
-            TRANSITIONS: {"which_story_node": cnd.all([loc_cnd.is_asked_for_a_story, int_cnd.is_yes_vars])},
+            TRANSITIONS: {
+                "gpt_story": cnd.neg(loc_cnd.needs_scripted_story),
+                "which_story_node": cnd.all(
+                    [
+                        loc_cnd.is_asked_for_a_story,
+                        int_cnd.is_yes_vars,
+                        loc_cnd.needs_scripted_story
+                    ])
+                },
         },
+        "gpt_story": {
+            RESPONSE: loc_rsp.generate_story}
     },
 }
 
