@@ -7,18 +7,17 @@ import torch
 from flask import Flask, request, jsonify
 from sentry_sdk.integrations.flask import FlaskIntegration
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import BartForConditionalGeneration, BartTokenizer
 
 import numpy as np
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 nltk.download('punkt')
-import RAKE
 import re
 from nltk.tokenize import sent_tokenize
 
 stop_words = stopwords.words('english')
-rake = RAKE.Rake(stop_words)
 
 sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"), integrations=[FlaskIntegration()])
 
@@ -33,11 +32,17 @@ ZERO_CONFIDENCE = 0.0
 # MAX_HISTORY_DEPTH = 3
 device = 'cpu'
 
+# bart = torch.hub.load('pytorch/fairseq', 'bart.base')
+# filled = bart.fill_mask(["Let me share a sad story about art. First, <mask> gallery"], topk=1, match_source_len=False, temperature=2)
+# logger.info(f'Filled mask: {filled}')
+
 try:
     tokenizer = GPT2Tokenizer.from_pretrained('finetuned2')
     tokenizer.padding_side = "left"
     tokenizer.pad_token = tokenizer.eos_token
     model = GPT2LMHeadModel.from_pretrained('finetuned2')
+    bart_model = BartForConditionalGeneration.from_pretrained("facebook/bart-large", forced_bos_token_id=0)
+    bart_tok = BartTokenizer.from_pretrained("facebook/bart-large")
     if torch.cuda.is_available():
         model.to("cuda")
         device = "cuda"
@@ -78,10 +83,20 @@ def generate_part(texts, max_len, temp, num_sents, first):
     return texts
 
 
+def fill_mask(masked_phrase):
+    batch = bart_tok(masked_phrase, return_tensors='pt')
+    generated_ids = bart_model.generate(batch['input_ids'])
+    filled = bart_tok.batch_decode(generated_ids, skip_special_tokens=True)
+    logger.info(f'Filled mask: {filled}')
+    return filled[0]
+
+
 def generate_response(context):
     noun = context[-1]
     logger.info(f"Topic in StoryGPT service: {noun}")
-    texts = [f"Let me share a story about {noun}. I had {noun}"]
+    masked = f"Let me share a story about {noun}. I <mask> {noun}"
+    filled = fill_mask(masked)
+    texts = [filled]
     first_texts = generate_part(texts, 30, 1, 4, first=True) # 100
     logger.info(f"First part ready: {first_texts[0]}")
     final_texts = generate_part(first_texts * 2, 50, 0.8, 5, first=False) # 150

@@ -275,8 +275,15 @@ class RuleBasedSkillSelectorConnector:
             if "/alexa_" in user_uttr_text:
                 skills_for_uttr = ["alexa_handler"]
 
-            if dialog["human_utterances"][-1]["annotations"]["intent_catcher"]["tell_me_a_story"]["detected"] == 1:
+            # if dialog["human_utterances"][-1]["annotations"]["intent_catcher"]["tell_me_a_story"]["detected"] == 1:
+            #     skills_for_uttr = ["dff_short_story_skill"]
+
+            if user_uttr_text == 'ok':
                 skills_for_uttr = ["dff_short_story_skill"]
+
+            # if len(dialog["human_utterances"]) > 1:
+            #     if dialog["human_utterances"][-1]["text"] == 'ok' and dialog["human_utterances"][-2]["text"] == 'ok':
+            #         skills_for_uttr = ["dff_short_story_skill"]
 
             logger.info(f"Selected skills: {skills_for_uttr}")
 

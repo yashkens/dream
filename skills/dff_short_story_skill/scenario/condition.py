@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger("werkzeug").setLevel("WARNING")
 
 STORY_TYPE = os.getenv("STORY_TYPE")
-logger.info(f"Story type in conditions: {STORY_TYPE}")
+# logger.info(f"Story type in conditions: {STORY_TYPE}")
 
 
 def has_story_type(ctx: Context, actor: Actor) -> bool:
@@ -35,5 +35,5 @@ def is_asked_for_a_story(ctx: Context, actor: Actor, *args, **kwargs) -> bool:
 def needs_scripted_story(ctx: Context, actor: Actor) -> bool:
     if STORY_TYPE == 'scripted':
         return True
-    logger.info(f"Story TYPE: {STORY_TYPE}")
+    # logger.info(f"Story TYPE: {STORY_TYPE}")
     return False

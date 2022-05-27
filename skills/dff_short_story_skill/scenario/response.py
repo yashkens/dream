@@ -8,6 +8,7 @@ from df_engine.core import Context, Actor
 
 import common.dff.integration.context as int_ctx
 import common.dff.integration.condition as int_cnd
+from common.constants import CAN_NOT_CONTINUE, CAN_CONTINUE_SCENARIO, MUST_CONTINUE, CAN_CONTINUE_PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -77,20 +78,20 @@ def which_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
     prev_node = get_previous_node(ctx)
     if prev_node in ["start_node", "fallback_node"]:
-        int_ctx.set_can_continue(ctx, actor, "MUST_CONTINUE")
+        int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
 
         # include sure if user asked to tell a story, include nothing if agent proposed to tell a story
         sure_phrase = random.choice(sorted(phrases.get("sure", []))) if prev_node == "start_node" else ""
         return sure_phrase + " " + random.choice(sorted(phrases.get("which_story", [])))
     elif prev_node == "choose_story_node":
-        int_ctx.set_can_continue(ctx, actor, "CANNOT_CONTINUE")
+        int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)
         return random.choice(sorted(phrases.get("no", [])))
     else:
         return "Ooops."
 
 
 def tell_punchline(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    int_ctx.set_can_continue(ctx, actor, "CAN_CONTINUE")
+    int_ctx.set_can_continue(ctx, actor, CAN_CONTINUE_SCENARIO)
     int_ctx.set_confidence(ctx, actor, 0.8) if int_cnd.is_do_not_know_vars(ctx, actor) else None
     story = ctx.misc.get("story", "")
     story_type = ctx.misc.get("story_type", "")
@@ -105,17 +106,17 @@ def fallback(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
     # runout stories
     if prev_node == "which_story_node" and story_type and not story_left:
-        int_ctx.set_can_continue(ctx, actor, "CANNOT_CONTINUE")
+        int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)
         return "Oh, sorry, but I've run out of stories."
 
     # no stories
     elif prev_node == "which_story_node" and not story_type:
-        int_ctx.set_can_continue(ctx, actor, "CAN_CONTINUE")
+        int_ctx.set_can_continue(ctx, actor, CAN_CONTINUE_SCENARIO)
         return random.choice(sorted(phrases.get("no_stories", [])))
 
     # if prev_node is tell_punchline_node or fallback_node
     else:
-        int_ctx.set_can_continue(ctx, actor, "MUST_CONTINUE")
+        int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
         int_ctx.set_confidence(ctx, actor, 0.5) if int_cnd.is_do_not_know_vars(ctx, actor) else None
         return random.choice(sorted(phrases.get("start_phrases", [])))
 
@@ -154,11 +155,12 @@ def choose_noun(nouns):
 
 
 def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    int_ctx.set_can_continue(ctx, actor, "MUST_CONTINUE")
+    int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
     return "What do you want the story to be about?"
 
 
 def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
+    int_ctx.set_confidence(ctx, actor, 2.0)
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     logger.info(f'Utterance: {utt}')
     if utt:
@@ -177,11 +179,11 @@ def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
         logger.info(f'Final noun: {final_noun}')
 
-        resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[utt]]}, timeout=300)
+        resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[final_noun]]}, timeout=300)
         raw_responses = resp.json()
         logger.info(f"skill receives from service: {raw_responses}")
         reply = raw_responses[0][0]
-        reply = 'Oh, that reminded me of a story! ' + reply
+        reply = 'Ok,  ' + reply
     else:
         reply = ''
     return reply

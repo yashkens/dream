@@ -4,6 +4,13 @@ FROM pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
 RUN apt-get update && apt-get install -y gnupg2
 RUN apt install -y curl
 
+#RUN apt-get install -y gcc-5 g++-5
+#RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+#
+#RUN apt-get install aptitude
+#RUN aptitude install build-essential
+# https://github.com/rusty1s/pytorch_scatter/issues/47
+
 RUN apt-key del 7fa2af80  && \
     rm -f /etc/apt/sources.list.d/cuda*.list && \
     curl https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb \
@@ -21,6 +28,8 @@ COPY ./requirements.txt /src/requirements.txt
 RUN pip install -r /src/requirements.txt
 RUN python -c "import nltk; nltk.download('punkt')"
 RUN python -c "import nltk; nltk.download('stopwords')"
+RUN python -c "from transformers import BartForConditionalGeneration; BartForConditionalGeneration.from_pretrained('facebook/bart-large', forced_bos_token_id=0)"
+RUN python -c "from transformers import BartTokenizer; BartTokenizer.from_pretrained('facebook/bart-large')"
 
 COPY . /src
 
