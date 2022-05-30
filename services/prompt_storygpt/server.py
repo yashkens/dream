@@ -48,9 +48,7 @@ try:
         device = "cuda"
         logger.info("prompt_storygpt is set to run on cuda")
 
-    # model.load_state_dict(torch.load('filtered_ROCStories_gpt_medium.pt', map_location=torch.device('cpu')))
-
-    logger.info("gpt is ready")
+    logger.info("prompt_storygpt is ready")
 except Exception as e:
     sentry_sdk.capture_exception(e)
     logger.exception(e)
@@ -71,11 +69,10 @@ def generate_part(texts, max_len, temp, num_sents, first):
     texts = []
     for text in generated_texts:
         text = re.sub('\(.*?\)', '', text)  # delete everything in ()
-        # text = re.sub("[#%\\(\)\*\+<=>\\\^|~]+", '.', text)
         text = text.replace(' .', '.').replace('..', '.').replace('..', '.')
         sents = sent_tokenize(text)
         text = text[:len(' '.join(sents[:num_sents]))]
-        if text[-1] not in '.!?;':
+        if text[-1] not in ',.!?;':
             text += '.'
         if first:
             text += " In the end,"
@@ -98,7 +95,7 @@ def generate_response(context):
     filled = fill_mask(masked)
     texts = [filled]
     first_texts = generate_part(texts, 30, 1, 4, first=True) # 100
-    logger.info(f"First part ready: {first_texts[0]}")
+    logger.info(f"First part generated: {first_texts[0]}")
     final_texts = generate_part(first_texts * 2, 50, 0.8, 5, first=False) # 150
 
     logger.info(f"Generated: {final_texts[0]}")

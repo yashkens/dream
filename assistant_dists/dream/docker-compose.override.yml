@@ -3,7 +3,7 @@ services:
     command: sh -c 'bin/wait && python -m deeppavlov_agent.run -ch http_client -pl assistant_dists/dream/pipeline_conf.json --cors'
     environment:
       WAIT_HOSTS: "convers-evaluator-annotator:8004,
-          spacy-nounphrases:8006, dff-program-y-skill:8008, sentseg:8011, convers-evaluation-selector:8009, 
+          spacy-nounphrases:8006, rake-keywords:8007, dff-program-y-skill:8008, sentseg:8011, convers-evaluation-selector:8009,
           personality-catcher:8010, dff-intent-responder-skill:8012, intent-catcher:8014, badlisted-words:8018,
           sentrewrite:8017, ner:8021, dff-program-y-dangerous-skill:8022, dff-movie-skill:8023,
           convert-reddit:8029, personal-info-skill:8030, asr:8031, misheard-asr:8033, dff-weather-skill:8037,
@@ -47,6 +47,21 @@ services:
       context: .
       dockerfile: ./annotators/spacy_nounphrases/Dockerfile
     command: flask run -h 0.0.0.0 -p 8006
+    environment:
+      - FLASK_APP=server
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 256M
+
+  rake-keywords:
+    env_file: [ .env ]
+    build:
+      context: .
+      dockerfile: ./annotators/rake_keywords/Dockerfile
+    command: flask run -h 0.0.0.0 -p 8007
     environment:
       - FLASK_APP=server
     deploy:

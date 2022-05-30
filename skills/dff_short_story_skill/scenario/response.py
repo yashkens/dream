@@ -22,7 +22,7 @@ with open(
 ) as phrases_json:
     phrases = json.load(phrases_json)
 
-# STORYGPT_SERVICE_URL = "http://storygpt:8126/respond"
+STORYGPT_KEYWORDS_SERVICE_URL = "http://storygpt:8126/respond"
 STORYGPT_SERVICE_URL = "http://prompt-storygpt:8127/respond"
 
 
@@ -122,28 +122,27 @@ def fallback(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
 
 def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    # logger.info(f"Last utterance: {ctx.last_request}")
-    # full_ctx = ctx.misc.get('agent', {}).get('dialog', {}).get('human_utterances', [])
-    # if full_ctx:
-    #     ctx_texts = [c['text'] for c in full_ctx]
-    #     # logger.info(f"Full context: {full_ctx}")
-    #     logger.info(f"Contexts sent to StoryGPT service: {ctx_texts}")
-    #     resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [ctx_texts]}, timeout=30)
-    #
-    # else:
-    #     logger.info(f"CTX CONTENTS: {full_ctx}")
-    #     resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=30)
-    # resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[ctx.last_request]]}, timeout=30)
+    int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)
+    reply = ''
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
-    logger.info(f'Utterance: {utt}')
     if utt:
-        resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[utt]]}, timeout=300)
+        full_ctx = ctx.misc.get('agent', {}).get('dialog', {}).get('human_utterances', [])
+        nouns = full_ctx[-1]['annotations']['spacy_nounphrases']
+        logger.info(f"RAKE keywords: {full_ctx[-1]['annotations']['rake_keywords']}")
+        logger.info(f"Nouns: {nouns}")
+        if len(full_ctx) > 1:
+            nouns_tmp = full_ctx[-2]['annotations']['spacy_nounphrases']
+            nouns_tmp.extend(nouns)
+            nouns = nouns_tmp
+        logger.info(f"Nouns from annotator: {nouns}")
+        ctx_texts = [c['text'] for c in full_ctx]
+        logger.info(f"Contexts sent to StoryGPT service: {ctx_texts}")
+        resp = requests.post(STORYGPT_KEYWORDS_SERVICE_URL, json={"utterances_histories": [[nouns]]}, timeout=300)
         raw_responses = resp.json()
-        logger.info(f"skill receives from service: {raw_responses}")
         reply = raw_responses[0][0]
         reply = 'Oh, that reminded me of a story! ' + reply
     else:
-        reply = ''
+        logger.info(f"No context")
     return reply
 
 
@@ -156,11 +155,22 @@ def choose_noun(nouns):
 
 def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
+    utt = int_ctx.get_last_human_utterance(ctx, actor)
+    if utt["text"]:
+        # utterances = ctx['agent']['dialog']['human_utterances']
+        last_utterance = utt
+        story_intent = last_utterance['annotations']['intent_catcher']['tell_me_a_story']['detected']
+        logger.info(f"Story intent value: {story_intent}")
+        if story_intent == 1:
+            logger.info(f"We need a story!")
+    else:
+        logger.info(f"No utterances given")
     return "What do you want the story to be about?"
 
 
 def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     int_ctx.set_confidence(ctx, actor, 2.0)
+    int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     logger.info(f'Utterance: {utt}')
     if utt:
@@ -172,16 +182,15 @@ def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
         final_noun = choose_noun(nouns)
         if "don't know" in last_utt or "not know" in last_utt \
             or "don't care" in last_utt or "not care" in last_utt:
-            final_noun = 'a cat'
+            final_noun = 'cat'
         if not final_noun:
-            final_noun = 'a cat'
-        final_noun = final_noun.replace('my', '').strip()
-
+            final_noun = 'cat'
+        final_noun = final_noun.split(' ')[-1].lower()
         logger.info(f'Final noun: {final_noun}')
 
         resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[final_noun]]}, timeout=300)
         raw_responses = resp.json()
-        logger.info(f"skill receives from service: {raw_responses}")
+        logger.info(f"Skill receives from service: {raw_responses}")
         reply = raw_responses[0][0]
         reply = 'Ok,  ' + reply
     else:

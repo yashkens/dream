@@ -169,6 +169,19 @@
                 ],
                 "state_manager_method": "add_annotation"
             },
+            "rake_keywords": {
+                "connector": {
+                    "protocol": "http",
+                    "timeout": 1,
+                    "url": "http://rake-keywords:8007/respond"
+                },
+                "dialog_formatter": "state_formatters.dp_formatters:preproc_last_human_utt_dialog",
+                "response_formatter": "state_formatters.dp_formatters:simple_formatter_service",
+                "previous_services": [
+                    "annotators.spelling_preprocessing"
+                ],
+                "state_manager_method": "add_annotation"
+            },
             "conceptnet": {
                 "connector": {
                     "protocol": "http",
@@ -967,7 +980,7 @@
             "storygpt": {
                 "connector": {
                     "protocol": "http",
-                    "timeout": 30,
+                    "timeout": 300,
                     "url": "http://storygpt:8126/respond"
                 },
                 "dialog_formatter": "state_formatters.dp_formatters:last_utt_and_history_dialog",
