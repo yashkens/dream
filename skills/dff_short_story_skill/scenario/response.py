@@ -127,14 +127,13 @@ def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     if utt:
         full_ctx = ctx.misc.get('agent', {}).get('dialog', {}).get('human_utterances', [])
-        nouns = full_ctx[-1]['annotations']['spacy_nounphrases']
-        logger.info(f"RAKE keywords: {full_ctx[-1]['annotations']['rake_keywords']}")
-        logger.info(f"Nouns: {nouns}")
+        nouns = full_ctx[-1]['annotations']['rake_keywords']
+        logger.info(f"Nouns: {full_ctx[-1]['annotations']['spacy_nounphrases']}")
         if len(full_ctx) > 1:
-            nouns_tmp = full_ctx[-2]['annotations']['spacy_nounphrases']
+            nouns_tmp = full_ctx[-2]['annotations']['rake_keywords']
             nouns_tmp.extend(nouns)
             nouns = nouns_tmp
-        logger.info(f"Nouns from annotator: {nouns}")
+        logger.info(f"Keywords from annotator: {nouns}")
         ctx_texts = [c['text'] for c in full_ctx]
         logger.info(f"Contexts sent to StoryGPT service: {ctx_texts}")
         try:
@@ -159,16 +158,15 @@ def choose_noun(nouns):
 def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
     int_ctx.set_confidence(ctx, actor, 1.0)
-    utt = int_ctx.get_last_human_utterance(ctx, actor)
-    if utt["text"]:
-        # utterances = ctx['agent']['dialog']['human_utterances']
-        last_utterance = utt
-        story_intent = last_utterance['annotations']['intent_catcher']['tell_me_a_story']['detected']
-        logger.info(f"Story intent value: {story_intent}")
-        if story_intent == 1:
-            logger.info(f"We need a story!")
-    else:
-        logger.info(f"No utterances given")
+    # utt = int_ctx.get_last_human_utterance(ctx, actor)
+    # if utt["text"]:
+    #     last_utterance = utt
+    #     story_intent = last_utterance['annotations']['intent_catcher']['tell_me_a_story']['detected']
+    #     logger.info(f"Story intent value: {story_intent}")
+    #     if story_intent == 1:
+    #         logger.info(f"We need a story!")
+    # else:
+    #     logger.info(f"No utterances given")
     return "What do you want the story to be about?"
 
 

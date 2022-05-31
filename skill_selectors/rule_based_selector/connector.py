@@ -279,8 +279,8 @@ class RuleBasedSkillSelectorConnector:
                 skills_for_uttr = ["dff_short_story_skill"]
 
             if len(dialog["human_utterances"]) > 1:
-                nouns = dialog["human_utterances"][-1]["annotations"].get('spacy_nounphrases', [])
-                nouns.extend(dialog["human_utterances"][-2]["annotations"].get('spacy_nounphrases', []))
+                nouns = dialog["human_utterances"][-1]["annotations"].get('rake_keywords', []) # spacy_nounphrases
+                nouns.extend(dialog["human_utterances"][-2]["annotations"].get('rake_keywords', []))
                 for hyp in prev_user_uttr_hyp:
                     if hyp["skill_name"] == 'dff_short_story_skill':
                         if hyp.get("can_continue", CAN_NOT_CONTINUE) in {
