@@ -137,8 +137,11 @@ def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
         logger.info(f"Nouns from annotator: {nouns}")
         ctx_texts = [c['text'] for c in full_ctx]
         logger.info(f"Contexts sent to StoryGPT service: {ctx_texts}")
-        resp = requests.post(STORYGPT_KEYWORDS_SERVICE_URL, json={"utterances_histories": [[nouns]]}, timeout=300)
-        raw_responses = resp.json()
+        try:
+            resp = requests.post(STORYGPT_KEYWORDS_SERVICE_URL, json={"utterances_histories": [[nouns]]}, timeout=300)
+            raw_responses = resp.json()
+        except Exception:
+            return ''
         reply = raw_responses[0][0]
         reply = 'Oh, that reminded me of a story! ' + reply
     else:
@@ -155,6 +158,7 @@ def choose_noun(nouns):
 
 def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
+    int_ctx.set_confidence(ctx, actor, 1.0)
     utt = int_ctx.get_last_human_utterance(ctx, actor)
     if utt["text"]:
         # utterances = ctx['agent']['dialog']['human_utterances']
@@ -188,8 +192,11 @@ def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
         final_noun = final_noun.split(' ')[-1].lower()
         logger.info(f'Final noun: {final_noun}')
 
-        resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[final_noun]]}, timeout=300)
-        raw_responses = resp.json()
+        try:
+            resp = requests.post(STORYGPT_SERVICE_URL, json={"utterances_histories": [[final_noun]]}, timeout=300)
+            raw_responses = resp.json()
+        except Exception:
+            return ''
         logger.info(f"Skill receives from service: {raw_responses}")
         reply = raw_responses[0][0]
         reply = 'Ok,  ' + reply

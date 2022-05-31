@@ -70,22 +70,22 @@ def handler(requested_data, random_seed=None):
 
 #     t_utils.save_to_test(responses, out_file, indent=4)  # TEST
 
-# try:
-#     test_server.run_test(handler)
-#     logger.info("test query processed")
-# except Exception as exc:
-#     sentry_sdk.capture_exception(exc)
-#     logger.exception(exc)
-#     raise exc
+try:
+    test_server.run_test(handler)
+    logger.info("test query processed")
+except Exception as exc:
+    sentry_sdk.capture_exception(exc)
+    logger.exception(exc)
+    raise exc
 
 logger.info(f"{SERVICE_NAME} is loaded and ready")
 
 
 @app.route("/respond", methods=["POST"])
 def respond():
-    # import common.test_utils as t_utils; t_utils.save_to_test(request.json,"tests/lets_talk_in.json",indent=4)  # TEST
+    # import common.test_utils as t_utils; t_utils.save_to_test(request.json,"tests/tell_funny_story_in.json",indent=4)  # TEST
     # responses = handler(request.json, RANDOM_SEED)  # TEST
-    # import common.test_utils as t_utils; t_utils.save_to_test(responses,"tests/lets_talk_out.json",indent=4)  # TEST
+    # import common.test_utils as t_utils; t_utils.save_to_test(responses,"tests/tell_funny_story_out.json",indent=4)  # TEST
     responses = handler(request.json)
     return jsonify(responses)
 
