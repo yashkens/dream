@@ -42,25 +42,29 @@ flows = {
             TRANSITIONS: {
                 "gpt_keyword_story": cnd.all(
                     [cnd.neg(loc_cnd.has_story_intent),
-                    cnd.neg(loc_cnd.needs_scripted_story)]
+                    cnd.neg(loc_cnd.needs_scripted_story),
+                    loc_cnd.should_return]
                 ),
                 "gpt_topic": cnd.all(
                     [loc_cnd.has_story_intent,
-                    cnd.neg(loc_cnd.needs_scripted_story)]
+                    cnd.neg(loc_cnd.needs_scripted_story),
+                    loc_cnd.should_return]
                 ),
                 "choose_story_node": cnd.all(
                     [
                         loc_cnd.is_tell_me_a_story,
                         loc_cnd.has_story_type,
                         loc_cnd.has_story_left,
-                        loc_cnd.needs_scripted_story
+                        loc_cnd.needs_scripted_story,
+                        loc_cnd.should_return
                     ]
                 ),
                 "which_story_node": cnd.all(
                     [
                         loc_cnd.is_tell_me_a_story,
                         cnd.neg(loc_cnd.has_story_type),
-                        loc_cnd.needs_scripted_story
+                        loc_cnd.needs_scripted_story,
+                        loc_cnd.should_return
                     ]),
             },
         },
