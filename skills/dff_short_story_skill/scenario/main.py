@@ -97,7 +97,7 @@ flows = {
             RESPONSE: loc_rsp.choose_topic,
             TRANSITIONS: {
                 # "gpt_story": cnd.true()
-                "gpt_story": cnd.prev_is_question
+                "gpt_story": loc_cnd.prev_is_question
             }
         },
         "gpt_story": {
