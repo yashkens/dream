@@ -24,11 +24,13 @@ flows = {
     GLOBAL: {TRANSITIONS: {
         ("story_flow", "gpt_topic"): cnd.all(
                     [loc_cnd.has_story_intent,
-                    cnd.neg(loc_cnd.needs_scripted_story)]
+                    cnd.neg(loc_cnd.needs_scripted_story),
+                    loc_cnd.should_return]
                 ),
         ("story_flow", "gpt_keyword_story"): cnd.all(
                     [cnd.neg(loc_cnd.has_story_intent),
-                    cnd.neg(loc_cnd.needs_scripted_story)]
+                    cnd.neg(loc_cnd.needs_scripted_story),
+                    loc_cnd.should_return]
                 ),
         ("story_flow", "fallback_node"): loc_cnd.needs_scripted_story}
     },

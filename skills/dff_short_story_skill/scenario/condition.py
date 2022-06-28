@@ -67,3 +67,12 @@ def asks_more(ctx: Context, actor: Actor) -> bool:
             return True
     return False
 
+
+def should_return(ctx: Context, actor: Actor) -> bool:
+    if prev_is_story(ctx, actor):
+        if asks_more(ctx, actor):
+            return True
+        else:
+            return False
+    else:
+        return True
