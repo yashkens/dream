@@ -94,9 +94,9 @@ def generate_response(context):
     masked = f"Let me share a story about {noun}. I <mask> {noun}"
     filled = fill_mask(masked)
     texts = [filled]
-    first_texts = generate_part(texts, 30, 1, 4, first=True) # 100
+    first_texts = generate_part(texts, 100, 1, 4, first=True) # 100
     logger.info(f"First part generated: {first_texts[0]}")
-    final_texts = generate_part(first_texts * 2, 50, 0.8, 5, first=False) # 150
+    final_texts = generate_part(first_texts * 2, 150, 0.8, 5, first=False) # 150
 
     logger.info(f"Generated: {final_texts[0]}")
     reply = final_texts[0]
