@@ -84,3 +84,15 @@ def prev_is_question(ctx: Context, actor: Actor) -> bool:
         if "What do you want the story to be about?" in utt["text"]:
             return True
     return False
+
+
+def has_five_keywords(ctx: Context, actor: Actor):
+    utt = int_ctx.get_last_bot_utterance(ctx, actor)
+    if utt["text"]:
+        utterances = int_ctx.get_human_utterances(ctx, actor)
+        if len(utterances) > 1:
+            nouns = utterances[-1]["annotations"].get('rake_keywords', [])  # spacy_nounphrases
+            nouns.extend(utterances[-2]["annotations"].get('rake_keywords', []))
+            if len(nouns) >= 5:
+                return True
+    return False
