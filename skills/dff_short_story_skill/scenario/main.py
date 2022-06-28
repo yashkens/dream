@@ -32,7 +32,9 @@ flows = {
                     cnd.neg(loc_cnd.needs_scripted_story),
                     loc_cnd.should_return]
                 ),
-        ("story_flow", "fallback_node"): loc_cnd.needs_scripted_story}
+        ("story_flow", "fallback_node"): cnd.all(
+            [loc_cnd.needs_scripted_story,
+             loc_cnd.should_return])}
     },
     "story_flow": {
         "start_node": {
