@@ -276,23 +276,15 @@ class RuleBasedSkillSelectorConnector:
                 skills_for_uttr = ["alexa_handler"]
 
             if dialog["human_utterances"][-1]["annotations"]["intent_catcher"]["tell_me_a_story"]["detected"] == 1:
-                skills_for_uttr = ["dff_short_story_skill"]
+                skills_for_uttr.append("dff_short_story_skill")
 
             if len(dialog["human_utterances"]) > 1:
                 nouns = dialog["human_utterances"][-1]["annotations"].get('rake_keywords', []) # spacy_nounphrases
                 nouns.extend(dialog["human_utterances"][-2]["annotations"].get('rake_keywords', []))
-                for hyp in prev_user_uttr_hyp:
-                    if hyp["skill_name"] == 'dff_short_story_skill':
-                        if hyp.get("can_continue", CAN_NOT_CONTINUE) in {
-                            CAN_CONTINUE_SCENARIO,
-                            MUST_CONTINUE,
-                            CAN_CONTINUE_PROMPT,
-                        }:
-                            if len(nouns) >= 5:
-                                skills_for_uttr = ["dff_short_story_skill"]
-                    else:
-                        if len(nouns) >= 5:
-                            skills_for_uttr = ["dff_short_story_skill"]
+
+                if prev_active_skill != 'dff_short_story_skill':
+                    if len(nouns) >= 5:
+                        skills_for_uttr.append("dff_short_story_skill")
 
             logger.info(f"Selected skills: {skills_for_uttr}")
 
