@@ -44,7 +44,8 @@ flows = {
                 "gpt_keyword_story": cnd.all(
                     [cnd.neg(loc_cnd.has_story_intent),
                     cnd.neg(loc_cnd.needs_scripted_story),
-                    loc_cnd.should_return]
+                    loc_cnd.should_return,
+                    loc_cnd.has_five_keywords]
                 ),
                 "gpt_topic": cnd.all(
                     [loc_cnd.has_story_intent,
