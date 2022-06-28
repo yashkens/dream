@@ -173,7 +173,7 @@ def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
 
 def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    int_ctx.set_confidence(ctx, actor, 0.9)  # востальных случаях конф=0.9 и can continue
+    int_ctx.set_confidence(ctx, actor, 1)  # востальных случаях конф=0.9 и can continue
     int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     logger.info(f'Utterance: {utt}')
