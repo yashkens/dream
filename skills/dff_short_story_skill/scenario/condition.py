@@ -81,6 +81,6 @@ def should_return(ctx: Context, actor: Actor) -> bool:
 def prev_is_question(ctx: Context, actor: Actor) -> bool:
     utt = int_ctx.get_last_bot_utterance(ctx, actor)
     if utt["text"]:
-        if utt["text"] == "What do you want the story to be about?":
+        if "What do you want the story to be about?" in utt["text"]:
             return True
     return False
