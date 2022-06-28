@@ -124,7 +124,8 @@ def fallback(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     # начинать с конф=0.9 и can continue prompt, если просто история сгенерировалась.
     int_ctx.set_confidence(ctx, actor, 0.9)
-    int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
+    # int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
+    int_ctx.set_can_continue(ctx, actor, CAN_CONTINUE_SCENARIO)
     reply = ''
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     if utt:
@@ -160,21 +161,13 @@ def choose_noun(nouns):
 def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
     int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
     int_ctx.set_confidence(ctx, actor, 1.0)
-    # utt = int_ctx.get_last_human_utterance(ctx, actor)
-    # if utt["text"]:
-    #     last_utterance = utt
-    #     story_intent = last_utterance['annotations']['intent_catcher']['tell_me_a_story']['detected']
-    #     logger.info(f"Story intent value: {story_intent}")
-    #     if story_intent == 1:
-    #         logger.info(f"We need a story!")
-    # else:
-    #     logger.info(f"No utterances given")
     return "What do you want the story to be about?"
 
 
 def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    int_ctx.set_confidence(ctx, actor, 1)  # востальных случаях конф=0.9 и can continue
-    int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
+    int_ctx.set_confidence(ctx, actor, 1.0)  # востальных случаях конф=0.9 и can continue
+    # int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
+    int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     logger.info(f'Utterance: {utt}')
     if utt:
