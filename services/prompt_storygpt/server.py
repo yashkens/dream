@@ -9,32 +9,23 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 from transformers import BartForConditionalGeneration, BartTokenizer
 
-import numpy as np
 import nltk
 from nltk.corpus import stopwords
-nltk.download('stopwords')
-nltk.download('punkt')
 import re
 from nltk.tokenize import sent_tokenize
 
+nltk.download('stopwords')
+nltk.download('punkt')
 stop_words = stopwords.words('english')
 
 sentry_sdk.init(dsn=os.getenv("SENTRY_DSN"), integrations=[FlaskIntegration()])
 
-
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# PRETRAINED_MODEL_NAME_OR_PATH = os.environ.get("PRETRAINED_MODEL_NAME_OR_PATH")
-# logging.info(f"PRETRAINED_MODEL_NAME_OR_PATH = {PRETRAINED_MODEL_NAME_OR_PATH}")
 DEFAULT_CONFIDENCE = 0.9
 ZERO_CONFIDENCE = 0.0
-# MAX_HISTORY_DEPTH = 3
 device = 'cpu'
-
-# bart = torch.hub.load('pytorch/fairseq', 'bart.base')
-# filled = bart.fill_mask(["Let me share a sad story about art. First, <mask> gallery"], topk=1, match_source_len=False, temperature=2)
-# logger.info(f'Filled mask: {filled}')
 
 try:
     tokenizer = GPT2Tokenizer.from_pretrained('finetuned2')
@@ -47,7 +38,6 @@ try:
         model.to("cuda")
         device = "cuda"
         logger.info("prompt_storygpt is set to run on cuda")
-
     logger.info("prompt_storygpt is ready")
 except Exception as e:
     sentry_sdk.capture_exception(e)
@@ -61,14 +51,14 @@ logging.getLogger("werkzeug").setLevel("WARNING")
 def generate_part(texts, max_len, temp, num_sents, first):
     encoding = tokenizer(texts, padding=True, return_tensors='pt').to(device)
     with torch.no_grad():
-        generated_ids = model.generate(**encoding, max_length=max_len, length_penalty=-100.0, temperature=temp,
-                                       do_sample=True)
+        generated_ids = model.generate(**encoding, max_length=max_len, length_penalty=-100.0,
+                                       temperature=temp, do_sample=True)
     generated_texts = tokenizer.batch_decode(
         generated_ids, skip_special_tokens=True)
 
     texts = []
     for text in generated_texts:
-        text = re.sub('\(.*?\)', '', text)  # delete everything in ()
+        text = re.sub(r'\(.*?\)', '', text)  # delete everything in ()
         text = text.replace(' .', '.').replace('..', '.').replace('..', '.')
         sents = sent_tokenize(text)
         text = text[:len(' '.join(sents[:num_sents]))]
@@ -94,10 +84,9 @@ def generate_response(context):
     masked = f"Let me share a story about {noun}. I <mask> {noun}"
     filled = fill_mask(masked)
     texts = [filled]
-    first_texts = generate_part(texts, 100, 1, 4, first=True) # 100
+    first_texts = generate_part(texts, 100, 1, 4, first=True)
     logger.info(f"First part generated: {first_texts[0]}")
-    final_texts = generate_part(first_texts * 2, 150, 0.8, 5, first=False) # 150
-
+    final_texts = generate_part(first_texts * 2, 150, 0.8, 5, first=False)
     logger.info(f"Generated: {final_texts[0]}")
     reply = final_texts[0]
     return reply

@@ -1,7 +1,0 @@
-click==7.1.2
-nltk==3.5
-python-rake
-sentence-transformers
-scikit-learn
-numpy
-transformers==4.11.3

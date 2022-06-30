@@ -1,12 +1,9 @@
 import logging
-import re
 import time
 from os import getenv
 
 import sentry_sdk
 from flask import Flask, request, jsonify
-
-from common.ignore_lists import FALSE_POS_NPS_LIST
 
 from nltk.corpus import stopwords
 import RAKE

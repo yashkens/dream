@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 logging.getLogger("werkzeug").setLevel("WARNING")
 
 STORY_TYPE = os.getenv("STORY_TYPE")
-# logger.info(f"Story type in conditions: {STORY_TYPE}")
 
 
 def has_story_type(ctx: Context, actor: Actor) -> bool:
@@ -37,7 +36,6 @@ def is_asked_for_a_story(ctx: Context, actor: Actor, *args, **kwargs) -> bool:
 def needs_scripted_story(ctx: Context, actor: Actor) -> bool:
     if STORY_TYPE == 'scripted':
         return True
-    # logger.info(f"Story TYPE: {STORY_TYPE}")
     return False
 
 
@@ -54,7 +52,8 @@ def has_story_intent(ctx: Context, actor: Actor) -> bool:
 def prev_is_story(ctx: Context, actor: Actor) -> bool:
     utt = int_ctx.get_last_bot_utterance(ctx, actor)
     if utt["text"]:
-        if utt["text"].startswith('Oh, that reminded me of a story!') or utt["text"].startswith('Ok, Let me tell you a story about'):
+        if utt["text"].startswith('Oh, that reminded me of a story!') \
+                or utt["text"].startswith('Ok, Let me tell you a story about'):
             return True
     return False
 
@@ -91,7 +90,7 @@ def has_five_keywords(ctx: Context, actor: Actor):
     if utt["text"]:
         utterances = int_ctx.get_human_utterances(ctx, actor)
         if len(utterances) > 1:
-            nouns = utterances[-1]["annotations"].get('rake_keywords', [])  # spacy_nounphrases
+            nouns = utterances[-1]["annotations"].get('rake_keywords', [])
             nouns.extend(utterances[-2]["annotations"].get('rake_keywords', []))
             if len(nouns) >= 5:
                 return True

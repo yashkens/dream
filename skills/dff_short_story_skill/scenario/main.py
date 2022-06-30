@@ -11,46 +11,49 @@ from . import response as loc_rsp
 
 logger = logging.getLogger(__name__)
 
-# ("story_flow", "gpt_topic"): cnd.all(
-#     [loc_cnd.has_story_intent,
-#      cnd.neg(loc_cnd.needs_scripted_story)]
-# ),
-# ("story_flow", "gpt_keyword_story"): cnd.all(
-#     [cnd.neg(loc_cnd.has_story_intent),
-#      cnd.neg(loc_cnd.needs_scripted_story)]
-# )
-
 flows = {
     GLOBAL: {TRANSITIONS: {
         ("story_flow", "gpt_topic"): cnd.all(
-                    [loc_cnd.has_story_intent,
-                    cnd.neg(loc_cnd.needs_scripted_story),
-                    loc_cnd.should_return]
+                    [
+                        loc_cnd.has_story_intent,
+                        cnd.neg(loc_cnd.needs_scripted_story),
+                        loc_cnd.should_return
+                    ]
                 ),
         ("story_flow", "gpt_keyword_story"): cnd.all(
-                    [cnd.neg(loc_cnd.has_story_intent),
-                    cnd.neg(loc_cnd.needs_scripted_story),
-                    loc_cnd.should_return,
-                    loc_cnd.has_five_keywords]
+                    [
+                        cnd.neg(loc_cnd.has_story_intent),
+                        cnd.neg(loc_cnd.needs_scripted_story),
+                        loc_cnd.should_return,
+                        loc_cnd.has_five_keywords
+                    ]
                 ),
         ("story_flow", "fallback_node"): cnd.all(
-            [loc_cnd.needs_scripted_story,
-             loc_cnd.should_return])}
+            [
+                loc_cnd.needs_scripted_story,
+                loc_cnd.should_return
+            ]
+        )
+    }
     },
     "story_flow": {
         "start_node": {
             RESPONSE: "",
             TRANSITIONS: {
                 "gpt_keyword_story": cnd.all(
-                    [cnd.neg(loc_cnd.has_story_intent),
-                    cnd.neg(loc_cnd.needs_scripted_story),
-                    loc_cnd.should_return,
-                    loc_cnd.has_five_keywords]
+                    [
+                        cnd.neg(loc_cnd.has_story_intent),
+                        cnd.neg(loc_cnd.needs_scripted_story),
+                        loc_cnd.should_return,
+                        loc_cnd.has_five_keywords
+                    ]
                 ),
                 "gpt_topic": cnd.all(
-                    [loc_cnd.has_story_intent,
-                    cnd.neg(loc_cnd.needs_scripted_story),
-                    loc_cnd.should_return]
+                    [
+                        loc_cnd.has_story_intent,
+                        cnd.neg(loc_cnd.needs_scripted_story),
+                        loc_cnd.should_return
+                    ]
                 ),
                 "choose_story_node": cnd.all(
                     [
@@ -67,7 +70,8 @@ flows = {
                         cnd.neg(loc_cnd.has_story_type),
                         loc_cnd.needs_scripted_story,
                         loc_cnd.should_return
-                    ]),
+                    ]
+                ),
             },
         },
         "choose_story_node": {
@@ -92,13 +96,13 @@ flows = {
                         loc_cnd.is_asked_for_a_story,
                         int_cnd.is_yes_vars,
                         loc_cnd.needs_scripted_story
-                    ])
-                },
+                    ]
+                )
+            },
         },
         "gpt_topic": {
             RESPONSE: loc_rsp.choose_topic,
             TRANSITIONS: {
-                # "gpt_story": cnd.true()
                 "gpt_story": loc_cnd.prev_is_question
             }
         },

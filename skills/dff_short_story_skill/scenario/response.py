@@ -8,7 +8,7 @@ from df_engine.core import Context, Actor
 
 import common.dff.integration.context as int_ctx
 import common.dff.integration.condition as int_cnd
-from common.constants import CAN_NOT_CONTINUE, CAN_CONTINUE_SCENARIO, MUST_CONTINUE, CAN_CONTINUE_PROMPT
+from common.constants import CAN_NOT_CONTINUE, CAN_CONTINUE_SCENARIO, MUST_CONTINUE
 
 logger = logging.getLogger(__name__)
 
@@ -122,9 +122,7 @@ def fallback(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
 
 def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    # начинать с конф=0.9 и can continue prompt, если просто история сгенерировалась.
     int_ctx.set_confidence(ctx, actor, 0.9)
-    # int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
     int_ctx.set_can_continue(ctx, actor, CAN_CONTINUE_SCENARIO)
     reply = ''
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
@@ -165,8 +163,7 @@ def choose_topic(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
 
 def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
-    int_ctx.set_confidence(ctx, actor, 1.0)  # востальных случаях конф=0.9 и can continue
-    # int_ctx.set_can_continue(ctx, actor, CAN_NOT_CONTINUE)  # чтобы не генерировать после?
+    int_ctx.set_confidence(ctx, actor, 1.0)
     int_ctx.set_can_continue(ctx, actor, MUST_CONTINUE)
     utt = int_ctx.get_last_human_utterance(ctx, actor)["text"]
     logger.info(f'Utterance: {utt}')
@@ -178,7 +175,7 @@ def generate_prompt_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
 
         final_noun = choose_noun(nouns)
         if "don't know" in last_utt or "not know" in last_utt \
-            or "don't care" in last_utt or "not care" in last_utt:
+                or "don't care" in last_utt or "not care" in last_utt:
             final_noun = 'cat'
         if not final_noun:
             final_noun = 'cat'
