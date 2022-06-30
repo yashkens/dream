@@ -145,7 +145,7 @@ def generate_story(ctx: Context, actor: Actor, *args, **kwargs) -> str:
         reply = raw_responses[0][0]
         reply = 'Oh, that reminded me of a story! ' + reply
     else:
-        logger.info(f"No context")
+        logger.info("No context")
     return reply
 
 
