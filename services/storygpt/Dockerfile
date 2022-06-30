@@ -3,6 +3,7 @@ FROM pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
 
 RUN apt-get update && apt-get install -y gnupg2
 RUN apt install -y curl
+RUN apt-get install -y --allow-unauthenticated wget
 
 RUN apt-key del 7fa2af80  && \
     rm -f /etc/apt/sources.list.d/cuda*.list && \
