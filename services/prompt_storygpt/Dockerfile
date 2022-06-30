@@ -23,6 +23,10 @@ ARG PRETRAINED_MODEL_NAME_OR_PATH
 ENV PRETRAINED_MODEL_NAME_OR_PATH ${PRETRAINED_MODEL_NAME_OR_PATH}
 ARG SERVICE_PORT
 ENV SERVICE_PORT ${SERVICE_PORT}
+ARG MODELS_URL
+ENV MODELS_URL ${MODELS_URL}
+ARG FILENAME
+ENV FILENAME ${FILENAME}
 
 COPY ./requirements.txt /src/requirements.txt
 RUN pip install -r /src/requirements.txt
@@ -30,7 +34,8 @@ RUN python -c "import nltk; nltk.download('punkt')"
 RUN python -c "import nltk; nltk.download('stopwords')"
 RUN python -c "from transformers import BartForConditionalGeneration; BartForConditionalGeneration.from_pretrained('facebook/bart-large', forced_bos_token_id=0)"
 RUN python -c "from transformers import BartTokenizer; BartTokenizer.from_pretrained('facebook/bart-large')"
-
+RUN wget ${MODELS_URL} && \
+    tar zxfv ${FILENAME}
 COPY . /src
 
 CMD gunicorn --workers=1 server:app -b 0.0.0.0:${SERVICE_PORT} --timeout=300
