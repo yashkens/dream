@@ -14,20 +14,20 @@ logger = logging.getLogger(__name__)
 flows = {
     GLOBAL: {TRANSITIONS: {
         ("story_flow", "gpt_topic"): cnd.all(
-                    [
-                        loc_cnd.has_story_intent,
-                        cnd.neg(loc_cnd.needs_scripted_story),
-                        loc_cnd.should_return
-                    ]
-                ),
+            [
+                loc_cnd.has_story_intent,
+                cnd.neg(loc_cnd.needs_scripted_story),
+                loc_cnd.should_return
+            ]
+        ),
         ("story_flow", "gpt_keyword_story"): cnd.all(
-                    [
-                        cnd.neg(loc_cnd.has_story_intent),
-                        cnd.neg(loc_cnd.needs_scripted_story),
-                        loc_cnd.should_return,
-                        loc_cnd.has_five_keywords
-                    ]
-                ),
+            [
+                cnd.neg(loc_cnd.has_story_intent),
+                cnd.neg(loc_cnd.needs_scripted_story),
+                loc_cnd.should_return,
+                loc_cnd.has_five_keywords
+            ]
+        ),
         ("story_flow", "fallback_node"): cnd.all(
             [
                 loc_cnd.needs_scripted_story,
@@ -76,10 +76,11 @@ flows = {
         },
         "choose_story_node": {
             RESPONSE: loc_rsp.choose_story,
-            TRANSITIONS: {
-                "tell_punchline_node": cnd.any([int_cnd.is_yes_vars, int_cnd.is_do_not_know_vars]),
-                "which_story_node": int_cnd.is_no_vars,
-            },
+            TRANSITIONS:
+                {
+                    "tell_punchline_node": cnd.any([int_cnd.is_yes_vars, int_cnd.is_do_not_know_vars]),
+                    "which_story_node": int_cnd.is_no_vars,
+                },
         },
         "which_story_node": {
             RESPONSE: loc_rsp.which_story,
