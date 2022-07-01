@@ -1219,7 +1219,7 @@ services:
         SERVICE_PORT: 8126
         SERVICE_NAME: storygpt
         PRETRAINED_MODEL_NAME_OR_PATH: gpt2-medium
-        MODEL_URL: http://files.deeppavlov.ai/dream_data/story_skill/filtered_ROCStories_gpt_medium.pt
+        MODELS_URL: http://files.deeppavlov.ai/dream_data/story_skill/filtered_ROCStories_gpt_medium.pt
       context: ./services/storygpt/
     command: flask run -h 0.0.0.0 -p 8126
     environment:
@@ -1239,7 +1239,7 @@ services:
         SERVICE_PORT: 8127
         SERVICE_NAME: prompt_storygpt
         PRETRAINED_MODEL_NAME_OR_PATH: gpt2-medium
-        MODEL_URL: http://files.deeppavlov.ai/dream_data/story_skill/finetuned2.tar.gz
+        MODELs_URL: http://files.deeppavlov.ai/dream_data/story_skill/finetuned2.tar.gz
       context: ./services/prompt_storygpt/
     command: flask run -h 0.0.0.0 -p 8127
     environment:
