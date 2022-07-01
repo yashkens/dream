@@ -27,7 +27,8 @@ try:
     tokenizer.add_tokens(['<EOT>', '<EOL>'], special_tokens=True)
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
     model.resize_token_embeddings(len(tokenizer))
-    model.load_state_dict(torch.load('filtered_ROCStories_gpt_medium.pt', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('./filtered_ROCStories_gpt_medium.pt', map_location=torch.device('cpu')))
+    # model.load_state_dict(torch.load('filtered_ROCStories_gpt_medium.pt', map_location=torch.device('cpu')))
 
     logger.info("storygpt is ready")
 except Exception as e:
