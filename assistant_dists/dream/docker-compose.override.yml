@@ -1223,7 +1223,7 @@ services:
       context: ./services/storygpt/
     command: flask run -h 0.0.0.0 -p 8126
     environment:
-      - CUDA_VISIBLE_DEVICES=0
+      - CUDA_VISIBLE_DEVICES=2
       - FLASK_APP=server
     deploy:
       resources:
@@ -1243,7 +1243,7 @@ services:
       context: ./services/prompt_storygpt/
     command: flask run -h 0.0.0.0 -p 8127
     environment:
-      - CUDA_VISIBLE_DEVICES=0
+      - CUDA_VISIBLE_DEVICES=3
       - FLASK_APP=server
     deploy:
       resources:
