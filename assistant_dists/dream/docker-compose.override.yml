@@ -1239,7 +1239,7 @@ services:
         SERVICE_PORT: 8127
         SERVICE_NAME: prompt_storygpt
         PRETRAINED_MODEL_NAME_OR_PATH: gpt2-medium
-        MODELs_URL: http://files.deeppavlov.ai/dream_data/story_skill/finetuned2.tar.gz
+        MODELS_URL: http://files.deeppavlov.ai/dream_data/story_skill/finetuned2.tar.gz
       context: ./services/prompt_storygpt/
     command: flask run -h 0.0.0.0 -p 8127
     environment:
