@@ -28,10 +28,10 @@ ZERO_CONFIDENCE = 0.0
 device = 'cpu'
 
 try:
-    tokenizer = GPT2Tokenizer.from_pretrained('data/finetuned2')
+    tokenizer = GPT2Tokenizer.from_pretrained('/data/finetuned2')
     tokenizer.padding_side = "left"
     tokenizer.pad_token = tokenizer.eos_token
-    model = GPT2LMHeadModel.from_pretrained('data/finetuned2')
+    model = GPT2LMHeadModel.from_pretrained('/data/finetuned2')
     bart_model = BartForConditionalGeneration.from_pretrained("facebook/bart-large", forced_bos_token_id=0)
     bart_tok = BartTokenizer.from_pretrained("facebook/bart-large")
     if torch.cuda.is_available():
